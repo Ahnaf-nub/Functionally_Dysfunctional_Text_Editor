@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import filedialog
 from textblob import TextBlob
 import re
+import random
+import plyer
+
+#sentiment analysis
 
 def analyze_sentiment(text):
     blob = TextBlob(text)
@@ -10,37 +14,50 @@ def analyze_sentiment(text):
 def edit_based_on_sentiment(text):
     polarity = analyze_sentiment(text)
     if polarity > 0:
-        text = f"Seems Positive: {text}"
-        return text
+        notify("Sentiment:", "Seems Positive!")
     elif polarity < 0:
-        text = f"Seems Negative: {text}"
-        return text
+        notify("Sentiment:", "Seems Negative, what are you writing?!")
     else:
-        text = f"Seems Neutral: {text}"
-        return text
+        notify("Sentiment:", "Neutral huh, you're a robot!")
+    return text
+
+#Detecting the programming language
 
 def detect_code(text, patterns):
     return any(re.search(pattern, text) for pattern in patterns)
 
+def notify(title: str, message: str):
+    plyer.notification.notify(
+        app_name="Sentiment Analysis for your text",
+        title=title,
+        message=message,
+        timeout=8,    
+    )
+
 def save_file(event=None):
     text = text_area.get("1.0", tk.END).strip()
     
-    # Patterns for different languages
-    python_patterns = [r'\bprint\b', r'\bdef\b', r'\bclass\b', r'\bif\b', r'{|}', r';', r'\bwith\b', r'\bimport\b', r'\bin\b', r'\breturn\b', r'\bfrom\b', r'\bas\b', r'\bglobal\b', r'\bnonlocal\b', r'\bassert\b', r'\byield\b', r'\btry\b', r'\bexcept\b', r'\bfinally\b', r'\braise\b', r'\bcontinue\b', r'\bbreak\b', r'\bpass\b', r'\bwhile\b', r'\blambda\b', r'\band\b', r'\bor\b', r'\bnot\b', r'\bis\b', r'\bin\b', r'\bNone\b', r'\bTrue\b', r'\bFalse\b', r'\bself\b']
+    # Patterns for different programming languages
 
-    c_patterns = [r'\b#define\b', r'\btypedef\b', r'\bstruct\b', r'\bunion\b', r'\benum\b', r'\bif\b', r'{|}', r';', r'\belse\b', r'\bwhile\b', r'\bdo\b', r'\bcontinue\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bauto\b', r'\bregister\b', r'\bstatic\b', r'\bextern\b', r'\bconst\b', r'\bvolatile\b', r'\bchar\b', r'\blong\b', r'\bfloat\b', r'\bdouble\b', r'\bsigned\b', r'\bunsigned\b', r'\bbool\b', r'\btrue\b', r'\bfalse\b']
+    python_patterns = [r'\bprint\b', r'\bdef\b', r'\bclass\b', r'\bif\b', r'\bwith\b', r'\bimport\b', r'\bin\b', r'\bfrom\b', r'\bas\b', r'\bglobal\b', r'\bnonlocal\b', r'\bassert\b', r'\byield\b', r'\btry\b', r'\bexcept\b', r'\bfinally\b', r'\braise\b', r'\bcontinue\b', r'\bbreak\b', r'\bpass\b', r'\bwhile\b', r'\blambda\b', r'\band\b', r'\bor\b', r'\bnot\b', r'\bis\b', r'\bin\b', r'\bNone\b', r'\bself\b']
 
-    arduino_patterns = [r'\bvoid setup\b', r'\bvoid loop\b', r'\bpinMode\b', r'\bdigitalWrite\b', r'\bdigitalRead\b', r'\banalogRead\b', r'\banalogWrite\b', r'\bSerial.begin\b', r'\bSerial.print\b', r'\bSerial.println\b', r'\bdelay\b', r'\bdelayMicroseconds\b', r'\battachInterrupt\b', r'\bdetachInterrupt\b', r'\bmillis\b', r'\bmicros\b', r'\bLOW\b', r'\bHIGH\b', r'\bINPUT\b', r'\bOUTPUT\b', r'\bINPUT_PULLUP\b', r'\bLED_BUILTIN\b', r'\btrue\b', r'\bfalse\b']
+    c_patterns = [r'\b#include\b',r'\b#define\b', r'\btypedef\b', r'\benum\b', r'\bif\b', r'{|}', r';', r'\belse\b', r'\bdo\b', r'\bcontinue\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bauto\b', r'\bregister\b', r'\bstatic\b', r'\bextern\b', r'\bconst\b', r'\bvolatile\b', r'\bchar\b', r'\blong\b', r'\bfloat\b', r'\bdouble\b', r'\bsigned\b', r'\bunsigned\b', r'\bbool\b']
 
-    cpp_patterns = [r'\busing namespace std\b', r'\bint main\b', r'\bcout\b', r'\bcin\b', r'\bendl\b', r'\bdo\b', r'\bcontinue\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bstatic\b']
+    arduino_patterns = [r'\bvoid setup\b', r'\bvoid loop\b', r'\bpinMode\b', r'\bdigitalWrite\b', r'\bdigitalRead\b', r'\banalogRead\b', r'\banalogWrite\b', r'\bSerial.begin\b', r'\bSerial.print\b', r'\bSerial.println\b', r'\bdelay\b', r'\bdelayMicroseconds\b', r'\battachInterrupt\b', r'\bdetachInterrupt\b', r'\bmillis\b', r'\bmicros\b', r'\bLOW\b', r'\bHIGH\b', r'\bINPUT\b', r'\bOUTPUT\b', r'\bINPUT_PULLUP\b', r'\bLED_BUILTIN\b']
+
+    cpp_patterns = [r'\busing namespace std\b', r'\bcout\b', r'\bcin\b', r'\bendl\b', r'\bdo\b', r'\bcontinue\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bstatic\b']
 
     if detect_code(text, python_patterns):
+        notify("Python Code Detected", "Your code is going to be saved as a Python file")
         file_path = filedialog.asksaveasfilename(defaultextension=".py", filetypes=[("Python files", "*.py")])
     elif detect_code(text, c_patterns):
+        notify("C Code Detected", "Your code is going to be saved as a C file")
         file_path = filedialog.asksaveasfilename(defaultextension=".c", filetypes=[("C files", "*.c")])
     elif detect_code(text, arduino_patterns):
+        notify("Arduino Code Detected", "Your code is going to be saved as an ino file")
         file_path = filedialog.asksaveasfilename(defaultextension=".ino", filetypes=[("Arduino files", "*.ino")])
     elif detect_code(text, cpp_patterns):
+        notify("C++ Code Detected", "Your code is going to be saved as a C++ file")
         file_path = filedialog.asksaveasfilename(defaultextension=".cpp", filetypes=[("C++ files", "*.cpp")])
     else:
         edited_text = edit_based_on_sentiment(text)
@@ -51,6 +68,9 @@ def save_file(event=None):
         with open(file_path, "w") as new_file:
             new_file.write(text)
         print(f"File saved in {file_path}.")
+        display_random_text()
+
+#Change Theme of the editor
 
 def toggle_dark_mode():
     current_bg = text_area.cget("background")
@@ -58,19 +78,41 @@ def toggle_dark_mode():
         text_area.config(background="black", foreground="white", insertbackground="white")
         root.config(bg="black")
         menu.config(bg="black", fg="white")
+        status_bar.config(bg="black", fg="white")
     else:
         text_area.config(background="white", foreground="black", insertbackground="black")
         root.config(bg="white")
         menu.config(bg="white", fg="black")
+        status_bar.config(bg="white", fg="black")
+
+#number of words in the text
+
+def update_word_count(event=None):
+    text = text_area.get("1.0", tk.END).strip()
+    word_count = len(text.split())
+    status_bar.config(text=f"Words: {word_count}")
+
+def display_random_text():
+    random_texts = ["Huh", "Done", "Saved", "seems legit", "Good Job", "Congo!", "Bro cooked", "The World Shall Know Pain", "Peace was never an option", "idk"]
+    colors = ["red", "green", "blue", "yellow", "purple", "orange", "cyan", "magenta", "brown"]
+    
+    for _ in range(10):  # Add 10 random texts
+        random_word = random.choice(random_texts)
+        random_color = random.choice(colors)
+        random_position = f"{random.randint(1, 20)}.{random.randint(0, 40)}"
+        text_area.insert(random_position, random_word)
+        text_area.tag_add(f"color{random_position}", random_position, f"{random_position} + {len(random_word)}c")
+        text_area.tag_config(f"color{random_position}", foreground=random_color)
 
 root = tk.Tk()
 root.title("Functionally Dysfunctional Text Editor")
 
 text_area = tk.Text(root, wrap="word", background="white", foreground="black", insertbackground="black")
 text_area.pack(expand=True, fill='both')
+text_area.bind("<KeyRelease>", update_word_count)
 
 menu = tk.Menu(root)
-root.config(menu=menu, bg="black")
+root.config(menu=menu, bg="white")
 
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="File", menu=file_menu)
@@ -78,8 +120,11 @@ file_menu.add_command(label="Save", command=save_file)
 root.bind('<Control-s>', save_file)
 
 view_menu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label="Theme", menu=view_menu)
+menu.add_cascade(label="View", menu=view_menu)
 view_menu.add_command(label="Toggle Dark Mode", command=toggle_dark_mode)
+
+status_bar = tk.Label(root, text="Words: 0", anchor="e")
+status_bar.pack(fill="x", side="bottom")
 
 root.mainloop()
 
