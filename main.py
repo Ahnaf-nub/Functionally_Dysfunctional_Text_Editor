@@ -5,8 +5,13 @@ import re
 import random
 import plyer
 
-#sentiment analysis
+# Patterns for different programming languages
+python_patterns = [r'\bprint\b', r'\bdef\b', r'\bclass\b', r'\bif\b', r'\bwith\b', r'\bimport\b', r'\bin\b', r'\bfrom\b', r'\bas\b', r'\bglobal\b', r'\bnonlocal\b', r'\bassert\b', r'\byield\b', r'\btry\b', r'\bexcept\b', r'\bfinally\b', r'\braise\b', r'\bcontinue\b', r'\bbreak\b', r'\bpass\b', r'\bwhile\b', r'\blambda\b', r'\band\b', r'\bor\b', r'\bnot\b', r'\bis\b', r'\bin\b', r'\bNone\b', r'\bself\b']
+c_patterns = [r'\b#include\b',r'\b#define\b', r'\btypedef\b', r'\benum\b', r'\bif\b', r'{|}', r';', r'\belse\b', r'\bdo\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bauto\b', r'\bregister\b', r'\bstatic\b', r'\bextern\b', r'\bconst\b', r'\bvolatile\b', r'\bchar\b', r'\blong\b', r'\bfloat\b', r'\bdouble\b', r'\bsigned\b', r'\bunsigned\b', r'\bbool\b']
+arduino_patterns = [r'\bvoid setup\b', r'\bvoid loop\b', r'\bpinMode\b', r'\bdigitalWrite\b', r'\bdigitalRead\b', r'\banalogRead\b', r'\banalogWrite\b', r'\bSerial.begin\b', r'\bSerial.print\b', r'\bSerial.println\b', r'\bdelay\b', r'\bdelayMicroseconds\b', r'\battachInterrupt\b', r'\bdetachInterrupt\b', r'\bmillis\b', r'\bmicros\b', r'\bLOW\b', r'\bHIGH\b', r'\bINPUT\b', r'\bOUTPUT\b', r'\bINPUT_PULLUP\b', r'\bLED_BUILTIN\b']
+cpp_patterns = [r'\busing namespace std\b', r'\bcout\b', r'\bcin\b', r'\bendl\b', r'\bdo\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bstatic\b']
 
+#sentiment analysis
 def analyze_sentiment(text):
     blob = TextBlob(text)
     return blob.sentiment.polarity
@@ -21,8 +26,16 @@ def edit_based_on_sentiment(text):
         notify("Sentiment:", "Neutral huh, you're a robot!")
     return text
 
-#Detecting the programming language
+def open_file():
+    # Open file dialog to select the file
+    file_path = filedialog.askopenfilename(defaultextension=".txt",
+                                           filetypes=[("Text Files", "*.txt"), 
+                                                      ("Python Files", "*.py"),
+                                                      ("C files", "*.c"),
+                                                      ("Arduino files", "*.ino"), 
+                                                      ("C++ files", "*.cpp")])
 
+#Detecting the programming language
 def detect_code(text, patterns):
     return any(re.search(pattern, text) for pattern in patterns)
 
@@ -34,18 +47,40 @@ def notify(title: str, message: str):
         timeout=8,    
     )
 
+
+def open_file(event=None):
+    file_path = filedialog.askopenfilename(defaultextension=".txt",
+                                           filetypes=[("Text Files", "*.txt"), 
+                                                      ("Python Files", "*.py"),
+                                                      ("C files", "*.c"),
+                                                      ("Arduino files", "*.ino"), 
+                                                      ("C++ files", "*.cpp")])
+    if file_path:
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read()
+                
+            text_area.delete(1.0, tk.END)  # Clear the text area
+            text_area.insert(tk.END, content)  # Load the file content into the text area
+
+            if detect_code(content, python_patterns):
+                notify("Python Code Detected", "Loaded a Python file")
+            elif detect_code(content, c_patterns):
+                notify("C Code Detected", "Loaded a C file")
+            elif detect_code(content, arduino_patterns):
+                notify("Arduino Code Detected", "Loaded an Arduino file")
+            elif detect_code(content, cpp_patterns):
+                notify("C++ Code Detected", "Loaded a C++ file")
+            else:
+                edited_text = edit_based_on_sentiment(content)
+                text_area.delete(1.0, tk.END)
+                text_area.insert(tk.END, edited_text)
+        except Exception as e:
+            notify("Error", f"Failed to open file: {str(e)}")
+            update_word_count()
+
 def save_file(event=None):
     text = text_area.get("1.0", tk.END).strip()
-    
-    # Patterns for different programming languages
-
-    python_patterns = [r'\bprint\b', r'\bdef\b', r'\bclass\b', r'\bif\b', r'\bwith\b', r'\bimport\b', r'\bin\b', r'\bfrom\b', r'\bas\b', r'\bglobal\b', r'\bnonlocal\b', r'\bassert\b', r'\byield\b', r'\btry\b', r'\bexcept\b', r'\bfinally\b', r'\braise\b', r'\bcontinue\b', r'\bbreak\b', r'\bpass\b', r'\bwhile\b', r'\blambda\b', r'\band\b', r'\bor\b', r'\bnot\b', r'\bis\b', r'\bin\b', r'\bNone\b', r'\bself\b']
-
-    c_patterns = [r'\b#include\b',r'\b#define\b', r'\btypedef\b', r'\benum\b', r'\bif\b', r'{|}', r';', r'\belse\b', r'\bdo\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bauto\b', r'\bregister\b', r'\bstatic\b', r'\bextern\b', r'\bconst\b', r'\bvolatile\b', r'\bchar\b', r'\blong\b', r'\bfloat\b', r'\bdouble\b', r'\bsigned\b', r'\bunsigned\b', r'\bbool\b']
-
-    arduino_patterns = [r'\bvoid setup\b', r'\bvoid loop\b', r'\bpinMode\b', r'\bdigitalWrite\b', r'\bdigitalRead\b', r'\banalogRead\b', r'\banalogWrite\b', r'\bSerial.begin\b', r'\bSerial.print\b', r'\bSerial.println\b', r'\bdelay\b', r'\bdelayMicroseconds\b', r'\battachInterrupt\b', r'\bdetachInterrupt\b', r'\bmillis\b', r'\bmicros\b', r'\bLOW\b', r'\bHIGH\b', r'\bINPUT\b', r'\bOUTPUT\b', r'\bINPUT_PULLUP\b', r'\bLED_BUILTIN\b']
-
-    cpp_patterns = [r'\busing namespace std\b', r'\bcout\b', r'\bcin\b', r'\bendl\b', r'\bdo\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bstatic\b']
 
     if detect_code(text, python_patterns):
         notify("Python Code Detected", "Your code is going to be saved as a Python file")
@@ -70,7 +105,6 @@ def save_file(event=None):
         print(f"File saved in {file_path}.")
 
 #Change Theme of the editor
-
 def toggle_dark_mode():
     current_bg = text_area.cget("background")
     if current_bg == "white":
@@ -85,7 +119,6 @@ def toggle_dark_mode():
         status_bar.config(bg="white", fg="black")
 
 #count the number of words in the text
-
 def update_word_count(event=None):
     text = text_area.get("1.0", tk.END).strip()
     word_count = len(text.split())
@@ -127,6 +160,9 @@ def save_with_game(event=None):
         text_area.tag_add(f"color{random_position}", random_position, f"{random_position} + {len(random_word)}c")
         text_area.tag_config(f"color{random_position}", foreground=random_color)
 
+def close_editor(event=None):
+    root.destroy()
+
 root = tk.Tk()
 root.title("Functionally Dysfunctional Text Editor")
 
@@ -139,8 +175,12 @@ root.config(menu=menu, bg="white")
 
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="File", menu=file_menu)
+file_menu.add_command(label="Open", command=open_file)
 file_menu.add_command(label="Save", command=save_with_game)
+
 root.bind('<Control-s>', save_with_game)
+root.bind('<Control-o>', open_file)
+root.bind('<Control-q>', close_editor)
 
 view_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="View", menu=view_menu)
@@ -150,4 +190,3 @@ status_bar = tk.Label(root, text="Words: 0", anchor="e")
 status_bar.pack(fill="x", side="bottom")
 clicks = 0
 root.mainloop()
-
