@@ -28,7 +28,7 @@ def detect_code(text, patterns):
 
 def notify(title: str, message: str):
     plyer.notification.notify(
-        app_name="Sentiment Analysis for your text",
+        app_name= "Analysis for your text",
         title=title,
         message=message,
         timeout=8,    
@@ -41,11 +41,11 @@ def save_file(event=None):
 
     python_patterns = [r'\bprint\b', r'\bdef\b', r'\bclass\b', r'\bif\b', r'\bwith\b', r'\bimport\b', r'\bin\b', r'\bfrom\b', r'\bas\b', r'\bglobal\b', r'\bnonlocal\b', r'\bassert\b', r'\byield\b', r'\btry\b', r'\bexcept\b', r'\bfinally\b', r'\braise\b', r'\bcontinue\b', r'\bbreak\b', r'\bpass\b', r'\bwhile\b', r'\blambda\b', r'\band\b', r'\bor\b', r'\bnot\b', r'\bis\b', r'\bin\b', r'\bNone\b', r'\bself\b']
 
-    c_patterns = [r'\b#include\b',r'\b#define\b', r'\btypedef\b', r'\benum\b', r'\bif\b', r'{|}', r';', r'\belse\b', r'\bdo\b', r'\bcontinue\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bauto\b', r'\bregister\b', r'\bstatic\b', r'\bextern\b', r'\bconst\b', r'\bvolatile\b', r'\bchar\b', r'\blong\b', r'\bfloat\b', r'\bdouble\b', r'\bsigned\b', r'\bunsigned\b', r'\bbool\b']
+    c_patterns = [r'\b#include\b',r'\b#define\b', r'\btypedef\b', r'\benum\b', r'\bif\b', r'{|}', r';', r'\belse\b', r'\bdo\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bauto\b', r'\bregister\b', r'\bstatic\b', r'\bextern\b', r'\bconst\b', r'\bvolatile\b', r'\bchar\b', r'\blong\b', r'\bfloat\b', r'\bdouble\b', r'\bsigned\b', r'\bunsigned\b', r'\bbool\b']
 
     arduino_patterns = [r'\bvoid setup\b', r'\bvoid loop\b', r'\bpinMode\b', r'\bdigitalWrite\b', r'\bdigitalRead\b', r'\banalogRead\b', r'\banalogWrite\b', r'\bSerial.begin\b', r'\bSerial.print\b', r'\bSerial.println\b', r'\bdelay\b', r'\bdelayMicroseconds\b', r'\battachInterrupt\b', r'\bdetachInterrupt\b', r'\bmillis\b', r'\bmicros\b', r'\bLOW\b', r'\bHIGH\b', r'\bINPUT\b', r'\bOUTPUT\b', r'\bINPUT_PULLUP\b', r'\bLED_BUILTIN\b']
 
-    cpp_patterns = [r'\busing namespace std\b', r'\bcout\b', r'\bcin\b', r'\bendl\b', r'\bdo\b', r'\bcontinue\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bstatic\b']
+    cpp_patterns = [r'\busing namespace std\b', r'\bcout\b', r'\bcin\b', r'\bendl\b', r'\bdo\b', r'\bbreak\b', r'\bgoto\b', r'\bswitch\b', r'\bcase\b', r'\bdefault\b', r'\bsizeof\b', r'\bstatic\b']
 
     if detect_code(text, python_patterns):
         notify("Python Code Detected", "Your code is going to be saved as a Python file")
@@ -68,7 +68,6 @@ def save_file(event=None):
         with open(file_path, "w") as new_file:
             new_file.write(text)
         print(f"File saved in {file_path}.")
-        display_random_text()
 
 #Change Theme of the editor
 
@@ -85,18 +84,42 @@ def toggle_dark_mode():
         menu.config(bg="white", fg="black")
         status_bar.config(bg="white", fg="black")
 
-#number of words in the text
+#count the number of words in the text
 
 def update_word_count(event=None):
     text = text_area.get("1.0", tk.END).strip()
     word_count = len(text.split())
     status_bar.config(text=f"Words: {word_count}")
 
-def display_random_text():
-    random_texts = ["Huh", "Done", "Saved", "seems legit", "Good Job", "Congo!", "Bro cooked", "The World Shall Know Pain", "Peace was never an option", "idk"]
-    colors = ["red", "green", "blue", "yellow", "purple", "orange", "cyan", "magenta", "brown"]
-    
-    for _ in range(10):  # Add 10 random texts
+# click me game
+def start_game():
+    game_window = tk.Toplevel(root)
+    game_window.title("Click the Target")
+    game_window.geometry("400x400")
+
+    target = tk.Button(game_window, text="Click Me!", bg="red", fg="white", command=lambda: on_target_click(game_window))
+    target.place(x=random.randint(0, 350), y=random.randint(0, 350))
+
+    def move_target():
+        target.place(x=random.randint(0, 350), y=random.randint(0, 350))
+        game_window.after(1000, move_target)
+
+    move_target()
+
+def on_target_click(game_window):
+    global clicks
+    clicks += 1
+    if clicks >= 5: # 5 click is required to save the file
+        game_window.destroy()
+        save_file() 
+
+def save_with_game(event=None):
+    global clicks
+    clicks = 0
+    start_game()  
+    for i in range(10):  # Add 10 random texts
+        random_texts = ["Huh?", "Done?", "Saved!", "seems legit!", "Good Job!", "Congo!", "Bro cooked.", "The World Shall Know Pain.", "Peace was never an option.", "Giving up is not an option."]
+        colors = ["red", "green", "blue", "yellow", "purple", "orange", "magenta", "brown"]
         random_word = random.choice(random_texts)
         random_color = random.choice(colors)
         random_position = f"{random.randint(1, 20)}.{random.randint(0, 40)}"
@@ -116,8 +139,8 @@ root.config(menu=menu, bg="white")
 
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="Save", command=save_file)
-root.bind('<Control-s>', save_file)
+file_menu.add_command(label="Save", command=save_with_game)
+root.bind('<Control-s>', save_with_game)
 
 view_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="View", menu=view_menu)
@@ -125,6 +148,6 @@ view_menu.add_command(label="Toggle Dark Mode", command=toggle_dark_mode)
 
 status_bar = tk.Label(root, text="Words: 0", anchor="e")
 status_bar.pack(fill="x", side="bottom")
-
+clicks = 0
 root.mainloop()
 
