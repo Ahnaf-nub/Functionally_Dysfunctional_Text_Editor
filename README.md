@@ -21,5 +21,5 @@ It is a quirky, sentiment-aware text editor that adds a fun twist to saving file
    pip install -r requirements.txt
 
    ```
-   python functionally_dysfunctional_text_editor.py
+   python main.py
    
