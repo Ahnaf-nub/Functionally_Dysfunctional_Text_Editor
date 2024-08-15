@@ -16,10 +16,10 @@ It is a quirky, sentiment-aware text editor that adds a fun twist to saving file
    ```bash
    git clone https://github.com/Ahnaf-nub/functionally-dysfunctional-text-editor.git
    cd functionally-dysfunctional-text-editor
-   
+2. **Install the requirements**
    ```
    pip install -r requirements.txt
-
+3. **Run the main file**
    ```
    python main.py
    
