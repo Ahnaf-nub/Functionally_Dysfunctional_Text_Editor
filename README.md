@@ -10,6 +10,8 @@ It is a quirky, sentiment-aware text editor that adds a fun twist to saving file
 - **Dark Mode**: Toggle between light and dark modes.
 - **Word Count**: Real-time word counting to keep track of your progress.
 
+Demo video link: https://youtu.be/gJ0JbgBYe0E?si=V6cOa3JdvctoyrCK
+
 ## Installation
 
 1. **Clone the Repository**:
