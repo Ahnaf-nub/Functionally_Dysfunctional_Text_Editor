@@ -16,7 +16,7 @@ Demo video link: https://youtu.be/gJ0JbgBYe0E?si=V6cOa3JdvctoyrCK
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/Ahnaf-nub/functionally-dysfunctional-text-editor.git
+   git clone https://github.com/Ahnaf-nub/Functionally_Dysfunctional_Text_Editor.git
    cd functionally-dysfunctional-text-editor
 2. **Install the dependencies**
    ```
